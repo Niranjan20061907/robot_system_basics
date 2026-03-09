@@ -1,4 +1,11 @@
 import socket
+from cryptography.fernet import Fernet
+
+# load shared secret key
+with open("secret.key", "rb") as f:
+    key = f.read()
+
+cipher = Fernet(key)
 
 server = socket.socket()
 
@@ -10,10 +17,17 @@ print("Robot waiting for command...")
 conn, addr = server.accept()
 print("Connected from:", addr)
 
-data = conn.recv(1024).decode()  # 1024 bytes
-print("Command received:", data)
+encrypted_data = conn.recv(1024)
 
-conn.send("ACK".encode())
+# decrypt command
+decrypted_data = cipher.decrypt(encrypted_data)
+
+data = decrypted_data.decode()
+
+print("Decrypted command received:", data)
+
+response = cipher.encrypt(b"ACK")
+conn.send(response)
 
 if data == "MOVE_FORWARD":
     print("Robot moving forward")
