@@ -14,4 +14,11 @@ data = conn.recv(1024).decode()  # 1024 bytes
 print("Command received:", data)
 
 conn.send("ACK".encode())
+
+if data == "MOVE_FORWARD":
+    print("Robot moving forward")
+
+elif data == "STOP":
+    print("Robot stopping")
+
 conn.close()
